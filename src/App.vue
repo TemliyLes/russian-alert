@@ -15,7 +15,7 @@
         </div>
       </ion-toolbar>
     </ion-header>
-    <MapComponent @sos="sos" />
+    <MapComponent :alarm="alarmCords" @sos="sos" />
   </ion-app>
 </template>
 
@@ -27,12 +27,15 @@ import { ref, onMounted } from 'vue';
 const URL = 'http://localhost:1313/';
 const connection = ref();
 
+const alarmCords = ref(null);
+
 const connectedFlag = ref(false)
-const sos = () => {
+const sos = (latlong: any) => {
+  console.log(latlong);
   if (connection.value) {
     connection.value.send(JSON.stringify({
-      type: 'register',
-      body: window.location.href,
+      type: 'alarm',
+      cords: latlong,
     }))
   } else {
     alert('no connection')
@@ -44,7 +47,8 @@ onMounted(() => {
   setTimeout(() => {
     connection.value = new WebSocket(URL);
     connection.value.onmessage = (e: any) => {
-      // console.log(e);
+      const cords = JSON.parse(e.data);
+      alarmCords.value = cords;
     }
     connection.value.onopen = (e: any) => {
       if (e.type == 'open') {

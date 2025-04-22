@@ -23,8 +23,11 @@
                 </l-layer-group>
             </l-map>
         </div>
-        <div class="alarm_btn" @click="sos()">
+        <div class="alarm_btn" @click="sos()" v-if="!alarm">
             Сообщить о тревоге
+        </div>
+        <div v-else class="alarm_btn alarm_btn__red">
+            Поступил сигнал тревоги
         </div>
     </div>
 </template>
@@ -37,7 +40,14 @@ import { onMounted, ref, watch, computed } from 'vue';
 import { Geolocation } from '@capacitor/geolocation';
 import WarningIcon from "./WarningIcon.vue";
 
-const emit = defineEmits(['sos'])
+const emit = defineEmits(['sos']);
+
+const props = defineProps({
+    alarm: {
+        type: Array,
+        default: () => []
+    }
+})
 
 const mapInstance = ref(null);
 const markers = ref(null);
@@ -52,7 +62,7 @@ const zoom = ref(14);
 const loc = ref(null);
 const latLong = computed(() => loc.value?.lat ? [loc.value.lat, loc.value.long] : null)
 const polyline = computed(() => alarmCoords.value ? [alarmCoords.value, latLong.value] : null)
-const alarmCoords = ref(null);
+const alarmCoords = computed(() => props.alarm?.length ? props.alarm : null);
 
 const getCurrentPosition = async () => {
     const pos = await Geolocation.getCurrentPosition();
@@ -95,7 +105,7 @@ onMounted(() => {
 // }
 
 const sos = () => {
-    emit('sos')
+    emit('sos', latLong.value)
 }
 
 watch(() => alarmCoords.value, val => {
@@ -131,7 +141,7 @@ watch(() => alarmCoords.value, val => {
 .alarm_btn {
     display: grid;
     place-items: center;
-    background: #ad1111;
+    background: #272727;
     color: #fff;
     font-weight: bold;
     position: fixed;
@@ -139,5 +149,9 @@ watch(() => alarmCoords.value, val => {
     width: 100%;
     height: 60px;
     z-index: 8989;
+}
+
+.alarm_btn__red {
+    background-color: #ad1111;
 }
 </style>
