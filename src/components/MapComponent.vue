@@ -3,12 +3,10 @@
         <teleport to="body">
             <div class="alert_overlay" v-if="!latLong">
                 <WarningIcon />
-                <div>Нет доступа к местоположению.</div>
+                <div>Нет доступа к местоположению</div>
             </div>
         </teleport>
-        <div @click="boom">
-            Где-то тревога
-        </div>
+
         <div id="map_canvas">
             <l-map ref="mapInstance" v-model:zoom="zoom"
                 :center="latLong ? latLong : [51.54572425995206, 43.17877702505453]" :use-global-leaflet="false"
@@ -25,6 +23,9 @@
                 </l-layer-group>
             </l-map>
         </div>
+        <div class="alarm_btn" @click="sos()">
+            Сообщить о тревоге
+        </div>
     </div>
 </template>
 
@@ -35,6 +36,8 @@ import L from 'leaflet';
 import { onMounted, ref, watch, computed } from 'vue';
 import { Geolocation } from '@capacitor/geolocation';
 import WarningIcon from "./WarningIcon.vue";
+
+const emit = defineEmits(['sos'])
 
 const mapInstance = ref(null);
 const markers = ref(null);
@@ -47,7 +50,7 @@ const mapOptions = {
 
 const zoom = ref(14);
 const loc = ref(null);
-const latLong = computed(() => loc.value ? [loc.value.lat, loc.value.long] : null)
+const latLong = computed(() => loc.value?.lat ? [loc.value.lat, loc.value.long] : null)
 const polyline = computed(() => alarmCoords.value ? [alarmCoords.value, latLong.value] : null)
 const alarmCoords = ref(null);
 
@@ -82,13 +85,17 @@ onMounted(() => {
     watchPosition();
 });
 
-const boom = () => {
-    const d = [51.52, 46.00];
-    if (!alarmCoords.value) {
-        alarmCoords.value = d;
-    } else {
-        alarmCoords.value = null;
-    }
+// const boom = () => {
+//     const d = [51.52, 46.00];
+//     if (!alarmCoords.value) {
+//         alarmCoords.value = d;
+//     } else {
+//         alarmCoords.value = null;
+//     }
+// }
+
+const sos = () => {
+    emit('sos')
 }
 
 watch(() => alarmCoords.value, val => {
@@ -103,8 +110,9 @@ watch(() => alarmCoords.value, val => {
 
 <style>
 #map_canvas {
-    height: calc(100dvh - 120px);
-    width: calc(100vw - 12px)
+    padding: 4px;
+    height: calc(100dvh - 86px);
+    width: calc(100vw)
 }
 
 .alert_overlay {
@@ -118,5 +126,18 @@ watch(() => alarmCoords.value, val => {
     color: #ddd;
     display: grid;
     place-items: center;
+}
+
+.alarm_btn {
+    display: grid;
+    place-items: center;
+    background: #ad1111;
+    color: #fff;
+    font-weight: bold;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 8989;
 }
 </style>

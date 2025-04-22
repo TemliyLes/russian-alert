@@ -2,13 +2,15 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Tab 3231</ion-title>
+        <div class="bar">
+          <img height="80px" src="https://upload.wikimedia.org/wikipedia/commons/5/57/Flag_of_Russian_Community.svg"
+            alt="">
+        </div>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Tab 123</ion-title>
           <MapComponent />
         </ion-toolbar>
       </ion-header>
@@ -19,9 +21,16 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonContent } from '@ionic/vue';
 import ExploreContainer from '@/components/ExploreContainer.vue';
+import MapComponent from '@/components/MapComponent.vue';
 
-
-import MapComponent from '@/components/MapComponent.vue'
 </script>
+
+<style>
+.bar {
+  background: #000;
+  display: grid;
+  place-items: center;
+}
+</style>
